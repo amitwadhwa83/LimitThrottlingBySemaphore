@@ -11,5 +11,4 @@ public class IncorrectStatusException extends GenericException {
     public IncorrectStatusException(String message) {
 	super(message);
     }
-
 }

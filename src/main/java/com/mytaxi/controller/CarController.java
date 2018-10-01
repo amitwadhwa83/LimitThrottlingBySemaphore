@@ -1,5 +1,6 @@
 package com.mytaxi.controller;
 
+import static com.mytaxi.controller.mapper.CarMapper.makeCarDO;
 import static com.mytaxi.controller.mapper.CarMapper.makeCarDTO;
 import static com.mytaxi.controller.mapper.CarMapper.makeCarDTOList;
 
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mytaxi.controller.mapper.CarMapper;
 import com.mytaxi.datatransferobject.CarDTO;
 import com.mytaxi.domainobject.CarDO;
 import com.mytaxi.exception.GenericException;
@@ -48,7 +48,7 @@ public class CarController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CarDTO createCar(@Valid @RequestBody CarDTO carDTO) throws GenericException {
-	CarDO carDO = CarMapper.makeCarDO(carDTO);
+	CarDO carDO = makeCarDO(carDTO);
 	return makeCarDTO(carService.createCar(carDO));
     }
 
@@ -63,7 +63,7 @@ public class CarController {
     }
 
     @GetMapping
-    public List<CarDTO> getCars() {
-	return makeCarDTOList(carService.findCars());
+    public List<CarDTO> listCar() {
+	return makeCarDTOList(carService.listCar());
     }
 }

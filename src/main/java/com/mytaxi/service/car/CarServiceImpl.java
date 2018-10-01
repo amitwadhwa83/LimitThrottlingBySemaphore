@@ -15,13 +15,11 @@ import com.mytaxi.dataaccessobject.CarRepository;
 import com.mytaxi.domainobject.CarDO;
 import com.mytaxi.exception.ConstraintsViolationException;
 import com.mytaxi.exception.EntityNotFoundException;
-import com.mytaxi.exception.GenericException;
 import com.mytaxi.exception.InvalidCarRatingException;
 
 /**
  * Service to encapsulate the link between DAO and controller and to have
  * business logic for car specific things.
- * <p/>
  */
 
 @Service
@@ -36,8 +34,17 @@ public class CarServiceImpl implements CarService {
 	this.carRepository = carRepository;
     }
 
+    /**
+     * Creates a new car.
+     *
+     * @param CarDO
+     * @return CarDO the created car
+     * @throws ConstraintsViolationException
+     *             if a car already exists with the given license or car already
+     *             exists with given inputs
+     */
     @Override
-    public CarDO createCar(CarDO carDO) throws GenericException {
+    public CarDO createCar(CarDO carDO) throws ConstraintsViolationException {
 	if (carRepository.findByLicensePlate(carDO.getLicensePlate()).isPresent()) {
 	    throw new ConstraintsViolationException(
 		    "A car with this license plate already exists:" + carDO.getLicensePlate());
@@ -52,14 +59,33 @@ public class CarServiceImpl implements CarService {
 	return car;
     }
 
+    /**
+     * Find a car by id.
+     *
+     * @param Long
+     *            carId
+     * @return CarDO found car
+     * @throws EntityNotFoundException
+     *             if no car with the given input is found
+     */
     @Override
-    public CarDO findCar(Long carId) throws GenericException {
+    public CarDO findCar(Long carId) throws EntityNotFoundException {
 	return findCarChecked(carId);
     }
 
+    /**
+     * Updates a car rating
+     *
+     * @param Long
+     *            carId,Integer rating
+     * @return CarDO update car
+     * @throws EntityNotFoundException
+     *             if no car with the given input is found,
+     *             InvalidCarRatingException for invalid rating input
+     */
     @Override
     @Transactional
-    public CarDO updateCar(Long carId, Integer rating) throws GenericException {
+    public CarDO updateCar(Long carId, Integer rating) throws InvalidCarRatingException, EntityNotFoundException {
 	if (!range.isValidValue(rating)) {
 	    throw new InvalidCarRatingException(rating.toString());
 	}
@@ -69,22 +95,36 @@ public class CarServiceImpl implements CarService {
 	return car;
     }
 
+    /**
+     * Deletes an existing car by id.
+     *
+     * @param Long
+     *            carId
+     * @return CarDO deleted car
+     * @throws EntityNotFoundException
+     *             if no car with the given input is found
+     */
     @Override
     @Transactional
-    public CarDO deleteCar(Long carId) throws GenericException {
+    public CarDO deleteCar(Long carId) throws EntityNotFoundException {
 	CarDO car = findCarChecked(carId);
 	carRepository.deleteById(carId);
 	return car;
     }
 
+    /**
+     * Find all cars available in system
+     * 
+     * @return List<CarDO> List of cars in system
+     */
     @Override
-    public List<CarDO> findCars() {
+    public List<CarDO> listCar() {
 	List<CarDO> listCardDO = new ArrayList<CarDO>();
 	carRepository.findAll().forEach(listCardDO::add);
 	return listCardDO;
     }
 
     private CarDO findCarChecked(Long carId) throws EntityNotFoundException {
-	return carRepository.findById(carId).orElseThrow(() -> new EntityNotFoundException(carId.toString()));
+	return carRepository.findCarChecked(carId);
     }
 }

@@ -11,5 +11,4 @@ public class InvalidCarRatingException extends GenericException {
     public InvalidCarRatingException(String message) {
 	super(message);
     }
-
 }

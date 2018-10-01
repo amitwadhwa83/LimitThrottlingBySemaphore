@@ -55,10 +55,6 @@ public class CarDO {
 
     private Boolean selected;
 
-    /*
-     * @Column(nullable = false) private Boolean active = true;
-     */
-
     private CarDO() {
     }
 
