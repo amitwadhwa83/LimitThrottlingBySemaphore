@@ -18,7 +18,7 @@ import com.mytaxi.exception.EntityNotFoundException;
 import com.mytaxi.exception.IncorrectStatusException;
 
 /**
- * Service used to drive the car assignment/removal to/from driver(s)
+ * Service for car assignment/removal to/from driver
  */
 
 @Service
