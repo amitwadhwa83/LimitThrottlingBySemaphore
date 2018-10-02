@@ -181,7 +181,7 @@ public class CarServiceImplTest {
     @Test
     public final void testListCarReturnsACarList() throws GenericException {
 	// GIVEN
-	Iterable<CarDO> carList = aCarList();
+	Iterable<CarDO> carList = aCarDOList();
 	when(carRepository.findAll()).thenReturn(carList);
 
 	// WHEN
@@ -201,7 +201,7 @@ public class CarServiceImplTest {
 	return car;
     }
 
-    private Iterable<CarDO> aCarList() {
+    private Iterable<CarDO> aCarDOList() {
 
 	int size = random.nextInt(10);
 	List<CarDO> listCarDO = new ArrayList<CarDO>(size);

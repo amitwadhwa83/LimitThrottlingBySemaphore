@@ -15,8 +15,6 @@ import java.util.Random;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -38,12 +36,9 @@ public class DriverCarSelServiceImplTest {
     DriverRepository driverRepository = mock(DriverRepository.class);
 
     @InjectMocks
-    DriverCarSelServiceImpl service = new DriverCarSelServiceImpl(carRepository, driverRepository);
+    DriverCarSelService service = new DriverCarSelServiceImpl(carRepository, driverRepository);
 
     Random random = new Random();
-
-    @Captor
-    ArgumentCaptor<?> carArgCaptor;
 
     @Test(expected = EntityNotFoundException.class)
     public final void testAssignDriverCarFailsForEntityNotFoundException() throws GenericException {
@@ -151,7 +146,7 @@ public class DriverCarSelServiceImplTest {
 	CarDO car = driver.getCar();
 	when(driverRepository.findDriverChecked(any(Long.class))).thenReturn(driver);
 	when(carRepository.save(any(CarDO.class))).thenReturn(car);
-	
+
 	Long driverId = random.nextLong();
 
 	// WHEN
