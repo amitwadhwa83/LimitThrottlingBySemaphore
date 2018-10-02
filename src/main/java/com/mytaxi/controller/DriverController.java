@@ -79,7 +79,7 @@ public class DriverController {
     }
 
     @DeleteMapping("/{driverId}/removeDriverCar")
-    public DriverDO removeDriverCar(@Valid @PathVariable long driverId) throws GenericException {
+    public DriverDO removeDriverCar(@PathVariable long driverId) throws GenericException {
 	return driverCarSelService.removeDriverCar(driverId);
     }
 }

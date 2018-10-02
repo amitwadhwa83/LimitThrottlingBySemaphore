@@ -1,6 +1,8 @@
 package com.mytaxi.service.driver;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.transaction.Transactional;
 
@@ -30,6 +32,19 @@ public class DriverCarSelServiceImpl implements DriverCarSelService {
 	this.driverRepository = driverRepository;
     }
 
+    // flyweight for car
+    private Map<Long, CarDO> carCache = new ConcurrentHashMap<Long, CarDO>();
+
+    private CarDO cacheCar(CarDO carDO) {
+	return carCache.computeIfAbsent(carDO.getId(), newCar -> {
+	    return carDO;
+	});
+    }
+
+    private void uncacheCar(CarDO carDO) {
+	carCache.remove(carDO.getId());
+    }
+
     /**
      * Car assignment/selection for driver
      *
@@ -55,22 +70,24 @@ public class DriverCarSelServiceImpl implements DriverCarSelService {
 	    throw new IncorrectStatusException(driverId.toString());
 	}
 
-	// Car already assigned check
-	CarDO car = carRepository.findCarChecked(carId);
-	if (null != car.getSelected() && car.getSelected()) {
-	    throw new CarAlreadyInUseException(carId.toString());
+	CarDO car = cacheCar(carRepository.findCarChecked(carId));
+	synchronized (car) {
+
+	    // Car already assigned check
+	    if (null != car.getSelected() && car.getSelected()) {
+		throw new CarAlreadyInUseException(carId.toString());
+	    }
+
+	    // De-select old car if any
+	    Optional.ofNullable(driver.getCar()).ifPresent(currentCar -> {
+		currentCar.setSelected(false);
+		carRepository.save(currentCar);
+	    });
+
+	    // Select the car
+	    car.setSelected(true);
+	    carRepository.save(car);
 	}
-
-	// De-select old car if any
-	Optional.ofNullable(driver.getCar()).ifPresent(currentCar -> {
-	    currentCar.setSelected(false);
-	    carRepository.save(currentCar);
-	});
-
-	// Select the car
-	car.setSelected(true);
-	carRepository.save(car);
-
 	// Assign
 	driver.setCar(car);
 	driverRepository.save(driver);
@@ -95,7 +112,7 @@ public class DriverCarSelServiceImpl implements DriverCarSelService {
 	// De-select car if any assigned
 	Optional.ofNullable(driver.getCar()).ifPresent(c -> {
 	    c.setSelected(false);
-	    carRepository.save(c);
+	    uncacheCar(carRepository.save(c));
 	});
 
 	driver.setCar(null);
