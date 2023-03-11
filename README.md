@@ -1,1 +1,1 @@
-Refer class at 'RateLimiter.java': C:\Users\pavu\Documents\GitHub\Rate-Limit-Throttling\src\main\java\com\messagebird\util
+A demo project to showcase Throttling capabilities using semaphore
